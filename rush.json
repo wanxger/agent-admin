@@ -23,11 +23,13 @@
   "projects": [
     {
       "packageName": "@agent-admin/agent-admin",
-      "projectFolder": "apps/agent-admin"
+      "projectFolder": "apps/agent-admin",
+      "shouldPublish": true
     },
     {
       "packageName": "@agent-admin/prompt",
-      "projectFolder": "libs/prompt"
+      "projectFolder": "libs/prompt",
+      "shouldPublish": true
     }
   ]
 }
