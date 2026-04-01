@@ -1,0 +1,11 @@
+{
+  "name": "agent-admin",
+  "version": "0.0.1",
+  "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "scripts": {},
+  "packageManager": "pnpm@10.22.0"
+}

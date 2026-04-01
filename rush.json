@@ -1,0 +1,33 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  "rushVersion": "5.162.0",
+  "pnpmVersion": "9.15.9",
+  "nodeSupportedVersionRange": ">=22.20.0 <23.0.0",
+  "projectFolderMinDepth": 2,
+  "projectFolderMaxDepth": 2,
+  "gitPolicy": {},
+  "repository": {
+    "url": "https://github.com/wanxger/agent-admin",
+    "defaultBranch": "main",
+    "defaultRemote": "origin"
+  },
+  "eventHooks": {
+    "preRushInstall": [],
+    "postRushInstall": [],
+    "preRushBuild": [],
+    "postRushBuild": [],
+    "preRushx": [],
+    "postRushx": []
+  },
+  "variants": [],
+  "projects": [
+    {
+      "packageName": "@agent-admin/agent-admin",
+      "projectFolder": "apps/agent-admin"
+    },
+    {
+      "packageName": "@agent-admin/prompt",
+      "projectFolder": "libs/prompt"
+    }
+  ]
+}
