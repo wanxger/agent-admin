@@ -1,120 +1,206 @@
 # @agent-admin/agent-admin
 
-Agent Admin CLI 工具，用于自动化开发任务执行。
+Agent Admin CLI tool - An automated development task execution tool based on ACP (Agent Client Protocol).
 
-## 安装
+[中文文档](./README-CN.md)
+
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [CLI Options](#cli-options)
+- [Usage Examples](#usage-examples)
+- [YAML Config Format](#yaml-config-format)
+- [How It Works](#how-it-works)
+- [Development Guide](#development-guide)
+- [Project Structure](#project-structure)
+- [Related Packages](#related-packages)
+- [License](#license)
+- [Repository](#repository)
+
+---
+
+## Installation
+
+### Install from npm
 
 ```bash
+npm install -g @agent-admin/agent-admin
+# or
+yarn global add @agent-admin/agent-admin
+# or
+pnpm add -g @agent-admin/agent-admin
+```
+
+### Develop from Source
+
+```bash
+git clone https://github.com/wanxger/agent-admin.git
+cd agent-admin
 rush update
 rush build
 ```
 
-## 使用
+#### npm link
 
-### 命令行参数
-
-```bash
-aa [options]
-```
-
-#### 参数说明
-
-| 参数 | 简写 | 描述 | 默认值 |
-|------|------|------|--------|
-| `--cwd <path>` | `-c` | 工作目录 | 当前运行目录 |
-| `--task <task>` | `-t` | 单个任务描述 | - |
-| `--file <path>` | `-f` | YAML 配置文件路径 | cwd 目录下的 aa.yaml |
-| `--parallel <number>` | `-p` | 并行任务数 | 1 |
-| `--retries <number>` | `-r` | 每个任务的最大重试次数 | 0 |
-| `--iterations <number>` | `-i` | 每个任务的最大迭代次数 | 5 |
-| `--help` | `-h` | 显示帮助信息 | - |
-
-### 使用示例
-
-#### 1. 执行单个任务
+You can use npm link to link the local version globally during development:
 
 ```bash
-aa --task "创建一个简单的 HTML 网页"
+# cd to project directory
+cd apps/agent-admin
+
+# link to global
+npm link
+
+# now you can use `aa` command anywhere
+aa --help
+
+# unlink
+npm unlink @agent-admin/agent-admin
 ```
 
-#### 2. 从 YAML 配置文件执行任务
+---
+
+## Quick Start
+
+The CLI provides two command aliases:
+- `aa` - Short alias
+- `agent-admin` - Full command name
+
+### 1. Run a single task
 
 ```bash
-aa --file tasks.yaml
+# using short alias
+aa --task "Create a simple HTML webpage"
+
+# or using full command name
+agent-admin --task "Create a simple HTML webpage"
 ```
 
-#### 3. 指定工作目录
+### 2. Use YAML config file
+
+Create `aa.yaml`:
+
+```yaml
+tasks:
+  - Create a simple HTML webpage
+  - Create a React component
+  - Write unit tests
+```
+
+Then run:
 
 ```bash
-aa --cwd ./my-project --task "开发一个 React 组件"
+aa --file aa.yaml
 ```
 
-#### 4. 并行执行多个任务
+---
+
+## CLI Options
+
+| Option | Short | Description | Default |
+|--------|-------|-------------|---------|
+| `--cwd <path>` | `-c` | Working directory | Current directory |
+| `--task <task>` | `-t` | Single task description | - |
+| `--file <path>` | `-f` | YAML config file path | aa.yaml in cwd |
+| `--parallel <number>` | `-p` | Number of parallel tasks | 1 |
+| `--retries <number>` | `-r` | Max retries per task | 0 |
+| `--iterations <number>` | `-i` | Max iterations per task | 5 |
+| `--help` | `-h` | Show help | - |
+
+---
+
+## Usage Examples
+
+### Example 1: Specify working directory
+
+```bash
+aa --cwd ./my-project --task "Develop a React component"
+```
+
+### Example 2: Run tasks in parallel
 
 ```bash
 aa --file tasks.yaml --parallel 3
 ```
 
-#### 5. 配置任务重试和迭代
+### Example 3: Configure retries and iterations
 
 ```bash
 aa --file tasks.yaml --parallel 2 --retries 2 --iterations 3
 ```
 
-## YAML 配置文件格式
+---
 
-创建一个名为 `aa.yaml` 的文件，格式如下：
+## YAML Config Format
 
 ```yaml
 tasks:
-  - 第一个任务描述
-  - 第二个任务描述
-  - 第三个任务描述
+  - First task description
+  - Second task description
+  - Third task description
 ```
 
-## 工作原理
+---
 
-1. 任务执行：根据任务描述开始开发工作
-2. 迭代判断：自动判断任务是否完成，最多迭代 `--iterations` 次
-3. 自动完善：根据判断结果自动完善代码
-4. 失败重试：任务执行失败时自动重试，最多重试 `--retries` 次
-5. 并行执行：支持同时执行多个任务，提高效率
+## How It Works
 
-## 开发
+1. **Task Execution**: Call ACP agent to start development work based on task description
+2. **Iteration Check**: Automatically check if task is complete, up to `--iterations` times
+3. **Auto-improve**: Automatically improve code based on judgment results
+4. **Retry on Failure**: Automatically retry when task fails, up to `--retries` times
+5. **Parallel Execution**: Support running multiple tasks simultaneously to improve efficiency
+
+---
+
+## Development Guide
 
 ```bash
-# 开发模式（监听文件变化）
+# cd to project directory
 cd apps/agent-admin
+
+# dev mode (watch)
 pnpm dev
 
-# 编译
+# build
 pnpm build
 
-# 清理
+# clean
 pnpm clean
+
+# test (TBD)
+pnpm test
 ```
 
-## 项目结构
+---
+
+## Project Structure
 
 ```
 apps/agent-admin/
 ├── src/
-│   └── main.ts          # 主入口文件
-├── dist/                # 编译输出目录
+│   └── main.ts          # main entry
+├── dist/                # build output
 ├── package.json
 └── README.md
 ```
 
-## 未来计划
+---
 
-- [ ] 工作流程可配置化：目前的工作流程是固定的，一个 agent 执行，一个 agent 验证，这个流程应是可以在配置文件中配置的
-- [ ] 支持 Markdown 引入：yaml 不支持图片，可以把任务的说明的 Markdown 引入
-- [ ] 上下文补充功能：如果需要补充上下文，agent 可以把需要咨询的内容补充出来
-- [ ] 进度反馈：agent 完成的进度可以反馈在一个进度文件中
-- [ ] 通用任务支持：目前的要求是固定用于开发的，以后可以会用于写作等更通用的任务，默认的描述需要更通用
-- [ ] 可以实现 webhook 通知功能
-- [ ] 支持在可用的 agent 中切换，可以预设工作流中的 agent
-- [ ] 支持切换模型
-- [ ] 支持按照预设情况切换 agent 或模型，比如某 agent 、模型组合失败一次或多次，切换其他 agent 、模型组合
-- [ ] 可以挂入系统定时执行
-- [ ] 执行某些固定任务时，可以让 agent 在首次编辑脚本，以后直接运行脚本
+## Related Packages
+
+- [@agent-admin/prompt](https://www.npmjs.com/package/@agent-admin/prompt) - ACP client library
+
+---
+
+## License
+
+MIT
+
+---
+
+## Repository
+
+https://github.com/wanxger/agent-admin
