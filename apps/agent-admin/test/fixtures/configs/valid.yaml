@@ -1,0 +1,5 @@
+tasks:
+  - task: "Example Task 1"
+    cwd: "/path/to/directory"
+  - task: "Example Task 2"
+    cwd: "."
