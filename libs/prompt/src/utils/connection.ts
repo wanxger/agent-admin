@@ -1,14 +1,22 @@
 import { Writable, Readable } from 'node:stream';
 import * as acp from '@agentclientprotocol/sdk';
 import { AcpClient } from './client.js';
-import { getAgentProcess } from './agent.js';
+import { getAgentProcess, parseAgentCommand } from './agent.js';
 
 let connection: acp.ClientSideConnection | null = null;
 let client: AcpClient | null = null;
+let currentAgentCommand: string | undefined = undefined;
 
-export const getAcpConnection = async () => {
-  if (!connection) {
-    const agentProcess = getAgentProcess();
+export const getAcpConnection = async (agentCommand?: string) => {
+  if (!connection || (agentCommand && currentAgentCommand !== agentCommand)) {
+    if (connection) {
+      console.debug(`agent command changed from ${currentAgentCommand} to ${agentCommand}, recreating connection`);
+      connection = null;
+      client = null;
+    }
+
+    currentAgentCommand = agentCommand;
+    const agentProcess = getAgentProcess(agentCommand);
 
     const input = Writable.toWeb(agentProcess.stdin!);
     const output = Readable.toWeb(agentProcess.stdout!) as ReadableStream<Uint8Array>;

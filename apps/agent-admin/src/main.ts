@@ -11,22 +11,31 @@ interface DebugOptions {
   cwd: string;
   task: string;
   maxIterations?: number;
+  agentCommand?: string;
 }
 
-interface Config {
-  tasks: string[];
+interface TaskConfig {
+  task: string;
+  cwd?: string;
+}
+
+export interface Config {
+  cwd?: string;
+  agent?: string;
+  tasks: (string | TaskConfig)[];
 }
 
 const defaultMaxIterations = 5;
 const defaultParallel = 1;
 
 export const run = async (options: DebugOptions) => {
-  const { cwd: workingDir, task, maxIterations: iterations = defaultMaxIterations } = options;
+  const { cwd: workingDir, task, maxIterations: iterations = defaultMaxIterations, agentCommand } = options;
 
   await mkdir(workingDir, { recursive: true });
 
   await prompt({
     cwd: workingDir,
+    agentCommand,
     prompt: [
       {
         type: 'text',
@@ -40,6 +49,7 @@ export const run = async (options: DebugOptions) => {
 
     const judgeRes = await prompt({
       cwd: workingDir,
+      agentCommand,
       prompt: [
         {
           type: 'text',
@@ -68,6 +78,7 @@ export const run = async (options: DebugOptions) => {
 
     await prompt({
       cwd: workingDir,
+      agentCommand,
       prompt: [
         {
           type: 'text',
@@ -82,7 +93,7 @@ ${judgeRes.message}
   }
 };
 
-const loadConfig = (configPath: string): Config | null => {
+export const loadConfig = (configPath: string): Config | null => {
   if (!existsSync(configPath)) {
     return null;
   }
@@ -90,6 +101,11 @@ const loadConfig = (configPath: string): Config | null => {
   try {
     const content = readFileSync(configPath, 'utf8');
     const config = load(content) as Config;
+
+    if (!config.tasks || !Array.isArray(config.tasks)) {
+      return null;
+    }
+
     return config;
   } catch (err) {
     console.error(`Error loading config file ${configPath}:`, err);
@@ -97,26 +113,52 @@ const loadConfig = (configPath: string): Config | null => {
   }
 };
 
+interface ResolvedTask {
+  task: string;
+  cwd: string;
+}
+
+const resolveTaskCwd = (task: string | TaskConfig, projectCwd?: string, defaultCwd = cwd()): ResolvedTask => {
+  if (typeof task === 'string') {
+    return {
+      task,
+      cwd: projectCwd ? resolve(projectCwd) : defaultCwd
+    };
+  }
+
+  const taskCwd = task.cwd ? resolve(task.cwd) : projectCwd ? resolve(projectCwd) : defaultCwd;
+
+  if (!task.task) {
+    throw new Error('Task config missing task name');
+  }
+
+  return {
+    task: task.task,
+    cwd: taskCwd
+  };
+};
+
 const runTaskWithRetry = async (
-  task: string,
-  workingDir: string,
+  task: ResolvedTask,
   maxIterations: number,
   maxRetries: number,
-  taskIndex: number
+  taskIndex: number,
+  agentCommand?: string
 ) => {
   for (let retry = 0; retry <= maxRetries; retry++) {
     try {
       console.log(
         `\n========== [任务 ${taskIndex + 1}] 执行任务 ${retry > 0 ? `(重试 ${retry}/${maxRetries})` : ''} ==========`
       );
-      console.log(`任务: ${task}`);
-      console.log(`工作目录: ${workingDir}`);
+      console.log(`任务: ${task.task}`);
+      console.log(`工作目录: ${task.cwd}`);
       console.log(`================================\n`);
 
       await run({
-        cwd: workingDir,
-        task,
-        maxIterations
+        cwd: task.cwd,
+        task: task.task,
+        maxIterations,
+        agentCommand
       });
 
       console.log(`\n✅ [任务 ${taskIndex + 1}] 执行成功`);
@@ -133,17 +175,17 @@ const runTaskWithRetry = async (
 };
 
 const runParallelTasks = async (
-  tasks: string[],
-  workingDir: string,
+  tasks: ResolvedTask[],
   maxIterations: number,
   maxRetries: number,
-  parallelCount: number
+  parallelCount: number,
+  agentCommand?: string
 ) => {
   const results: Promise<void>[] = [];
   const executing = new Set<Promise<void>>();
 
   for (let i = 0; i < tasks.length; i++) {
-    const taskPromise = runTaskWithRetry(tasks[i], workingDir, maxIterations, maxRetries, i);
+    const taskPromise = runTaskWithRetry(tasks[i], maxIterations, maxRetries, i, agentCommand);
 
     results.push(taskPromise);
     executing.add(taskPromise);
@@ -170,7 +212,8 @@ const main = async () => {
     .option('-f, --file <path>', 'YAML configuration file')
     .option('-p, --parallel <number>', 'Number of parallel tasks', '1')
     .option('-r, --retries <number>', 'Maximum number of retries per task', '0')
-    .option('-i, --iterations <number>', 'Maximum number of iterations per task', '5');
+    .option('-i, --iterations <number>', 'Maximum number of iterations per task', '5')
+    .option('-a, --agent <command>', 'ACP agent command (default: opencode acp)');
 
   program.parse();
 
@@ -182,36 +225,50 @@ const main = async () => {
   const maxRetries = parseInt(options.retries, 10) || 0;
   const maxIterations = parseInt(options.iterations, 10) || defaultMaxIterations;
 
-  let tasks: string[] = [];
+  let resolvedTasks: ResolvedTask[] = [];
+  let agentCommand: string | undefined = undefined;
 
   if (options.task) {
-    tasks = [options.task];
+    resolvedTasks = [{ task: options.task, cwd: workingDir }];
   } else {
     const config = loadConfig(configFile);
     if (config && config.tasks && Array.isArray(config.tasks)) {
-      tasks = config.tasks;
+      resolvedTasks = config.tasks.map((task) => resolveTaskCwd(task, config.cwd, workingDir));
+    }
+    if (config && config.agent) {
+      agentCommand = config.agent;
     }
   }
 
-  if (tasks.length === 0) {
+  if (options.agent) {
+    agentCommand = options.agent;
+  }
+
+  if (resolvedTasks.length === 0) {
     console.log('No tasks specified. Exiting.');
     process.exit(0);
   }
 
   console.log(`\n========== 任务配置 ==========`);
-  console.log(`任务总数: ${tasks.length}`);
+  console.log(`任务总数: ${resolvedTasks.length}`);
   console.log(`并行任务数: ${parallelCount}`);
   console.log(`最大重试次数: ${maxRetries}`);
   console.log(`最大迭代次数: ${maxIterations}`);
   console.log(`工作目录: ${workingDir}`);
   console.log(`================================\n`);
 
-  await runParallelTasks(tasks, workingDir, maxIterations, maxRetries, parallelCount);
+  await runParallelTasks(resolvedTasks, maxIterations, maxRetries, parallelCount, agentCommand);
 
   console.log('\n✅ 所有任务执行完成！');
 };
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+if (
+  process.argv[1]?.endsWith('/aa') ||
+  process.argv[1]?.endsWith('/agent-admin') ||
+  import.meta.url === `file://${process.argv[1]}`
+) {
+  main().catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
+}

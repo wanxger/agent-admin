@@ -3,7 +3,9 @@ import { getAcpConnection } from './connection.js';
 import { getSession, GetSessionParams } from './session.js';
 import { getAcpClient } from './connection.js';
 
-interface PromptParams extends Omit<PromptRequest, 'sessionId'>, GetSessionParams {}
+interface PromptParams extends Omit<PromptRequest, 'sessionId'>, GetSessionParams {
+  agentCommand?: string;
+}
 
 interface PromptRes extends PromptResponse {
   sessionId: string;
@@ -13,17 +15,18 @@ interface PromptRes extends PromptResponse {
 type Prompt = (params: PromptParams) => Promise<PromptRes>;
 
 export const prompt: Prompt = async (params) => {
-  const { prompt, cwd, mcpServers, sessionId: paramsSessionId } = params;
+  const { prompt, cwd, mcpServers, sessionId: paramsSessionId, agentCommand } = params;
 
   const getSessionRes = await getSession({
     cwd,
     mcpServers,
-    sessionId: paramsSessionId
+    sessionId: paramsSessionId,
+    agentCommand
   });
 
   const { sessionId } = getSessionRes;
 
-  const connection = await getAcpConnection();
+  const connection = await getAcpConnection(agentCommand);
 
   const client = getAcpClient();
 
