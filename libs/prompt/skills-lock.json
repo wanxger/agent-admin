@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "rushstack-best-practices": {
+      "source": "microsoft/rushstack",
+      "sourceType": "github",
+      "computedHash": "d12e3c9173402c6cddd31251eebac2462551f82b242abdca3968c4a726d56f46"
+    }
+  }
+}
