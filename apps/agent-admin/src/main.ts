@@ -6,6 +6,11 @@ import { existsSync, readFileSync } from 'node:fs';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { cwd } from 'node:process';
+import { createRequire } from 'node:module';
+import { ConfigValidator } from './config-validator.js';
+
+const require = createRequire(import.meta.url);
+const packageJson = require('../package.json');
 
 interface DebugOptions {
   cwd: string;
@@ -108,8 +113,7 @@ export const loadConfig = (configPath: string): Config | null => {
 
     return config;
   } catch (err) {
-    console.error(`Error loading config file ${configPath}:`, err);
-    return null;
+    throw err;
   }
 };
 
@@ -207,13 +211,14 @@ const main = async () => {
     .name('agent-admin')
     .alias('aa')
     .description('Agent Admin CLI')
-    .option('-c, --cwd <path>', 'Working directory')
+    .version(packageJson.version, '-v, --version', 'Output version number')
+    .option('-c, --cwd <path>', 'Working directory (overrides config file)')
     .option('-t, --task <task>', 'Task description')
     .option('-f, --file <path>', 'YAML configuration file')
     .option('-p, --parallel <number>', 'Number of parallel tasks', '1')
     .option('-r, --retries <number>', 'Maximum number of retries per task', '0')
     .option('-i, --iterations <number>', 'Maximum number of iterations per task', '5')
-    .option('-a, --agent <command>', 'ACP agent command (default: opencode acp)');
+    .option('-a, --agent <command>', 'ACP agent command (overrides config file, default: opencode acp)');
 
   program.parse();
 
@@ -227,15 +232,30 @@ const main = async () => {
 
   let resolvedTasks: ResolvedTask[] = [];
   let agentCommand: string | undefined = undefined;
+  const validator = new ConfigValidator();
+  let config: Config | null = null;
+  let configLoadError: unknown = null;
+
+  try {
+    config = loadConfig(configFile);
+  } catch (err) {
+    configLoadError = err;
+  }
+
+  if (configLoadError && existsSync(configFile)) {
+    const yamlValidation = validator.validateYamlError(configLoadError, configFile);
+    yamlValidation.errors.forEach((error) => console.error(error));
+    process.exit(1);
+  }
 
   if (options.task) {
     resolvedTasks = [{ task: options.task, cwd: workingDir }];
   } else {
-    const config = loadConfig(configFile);
     if (config && config.tasks && Array.isArray(config.tasks)) {
-      resolvedTasks = config.tasks.map((task) => resolveTaskCwd(task, config.cwd, workingDir));
+      const effectiveCwd = options.cwd || config.cwd;
+      resolvedTasks = config.tasks.map((task) => resolveTaskCwd(task, effectiveCwd, workingDir));
     }
-    if (config && config.agent) {
+    if (config && config.agent && !options.agent) {
       agentCommand = config.agent;
     }
   }
@@ -244,9 +264,32 @@ const main = async () => {
     agentCommand = options.agent;
   }
 
+  const taskCountValidation = validator.validateTaskCount(resolvedTasks.length, existsSync(configFile));
+  taskCountValidation.errors.forEach((error) => console.error(error));
+  taskCountValidation.warnings.forEach((warning) => console.warn(warning));
+
+  if (!taskCountValidation.isValid) {
+    process.exit(1);
+  }
+
   if (resolvedTasks.length === 0) {
     console.log('No tasks specified. Exiting.');
     process.exit(0);
+  }
+
+  const sourcesValidation = validator.validate({
+    configFilePath: configFile,
+    configCwd: config?.cwd,
+    configAgent: config?.agent,
+    cliCwd: options.cwd,
+    cliAgent: options.agent
+  });
+
+  sourcesValidation.errors.forEach((error: string) => console.error(error));
+  sourcesValidation.warnings.forEach((warning: string) => console.warn(warning));
+
+  if (!sourcesValidation.isValid) {
+    process.exit(1);
   }
 
   console.log(`\n========== 任务配置 ==========`);

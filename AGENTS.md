@@ -156,6 +156,9 @@ The agent-admin CLI supports YAML configuration files (default: `aa.yaml`) for d
 # Optional: Project-level working directory
 cwd: "/path/to/project"
 
+# Optional: Agent command
+agent: "custom-agent --config /path/to/config"
+
 # Required: List of tasks (can be strings or task objects)
 tasks:
   # Simple task (uses project-level cwd or default)
@@ -169,18 +172,40 @@ tasks:
     cwd: "./relative/path"
 ```
 
-### CWD Priority Rules
+### Configuration Priority Rules
+
+The agent-admin CLI supports multiple configuration sources with the following priority:
+
+1. **Command-line parameters** (highest priority)
+2. **Configuration file** (`aa.yaml`)
+3. **Default values**
+
+#### Working Directory (cwd) Priority
 
 The working directory for each task is determined by the following priority:
 
-1. **Task-level cwd** (highest priority)
-2. **Project-level cwd**
-3. **Process current directory** (default)
+1. **Command-line `--cwd`** (highest priority) - overrides all other sources
+2. **Task-level `cwd`** in configuration file
+3. **Project-level `cwd`** in configuration file
+4. **Process current directory** (default)
+
+When command-line `--cwd` conflicts with configuration file `cwd`, the command-line value is used and a warning is displayed.
+
+#### Agent Command Priority
+
+The agent command is determined by the following priority:
+
+1. **Command-line `--agent`** (highest priority) - overrides all other sources
+2. **Configuration file `agent`**
+3. **Default value** (`opencode acp`)
+
+When command-line `--agent` conflicts with configuration file `agent`, the command-line value is used and a warning is displayed.
 
 ### Example Configuration
 
 ```yaml
 cwd: "/home/user/my-project"
+agent: "custom-agent --config /path/to/config"
 
 tasks:
   - task: "Build the project"
@@ -196,33 +221,79 @@ In this example:
 - "Build the project" runs in `/home/user/my-project/build`
 - "Run tests" runs in `/home/user/my-project/test`
 - "Deploy to production" runs in `/home/user/my-project`
+- All tasks use the agent command `custom-agent --config /path/to/config`
 
 ### Command-Line Override
 
-You can also override the working directory using the `--cwd` flag:
+You can override configuration file settings using command-line flags:
 
 ```bash
+# Override working directory
 aa -c /custom/path
+
+# Override agent command
+aa --agent "another-agent --config /other/config"
+
+# Combine overrides
+aa -c /custom/path --agent "another-agent"
 ```
 
-### Agent Command Configuration
+When overriding values that exist in the configuration file, warnings will be displayed:
 
-You can also specify a custom ACP agent command using the `--agent` flag or in the configuration file:
-
-**Priority:** CLI `--agent` > Configuration file > Default value (`opencode acp`)
-
-#### Command Line
-```bash
-aa --agent "custom-agent --config /path/to/config"
+```
+⚠️  配置冲突: 配置文件和命令行参数都指定了 cwd
+   配置文件: /home/user/my-project
+   命令行参数: /custom/path
+   优先使用: 命令行参数 (/custom/path)
 ```
 
-#### Configuration File
+### Configuration Validation
+
+The CLI validates configuration at startup and will:
+
+- **Warn** when command-line parameters override configuration file values
+- **Error** when:
+  - Configuration file format is invalid (YAML syntax errors)
+  - Working directory does not exist
+  - No tasks are specified (no config file and no `--task` parameter)
+  - Task list is empty in configuration file
+
+### Examples
+
+#### Using Configuration File
+
 ```yaml
+cwd: "/home/user/my-project"
 agent: "custom-agent --config /path/to/config"
 
 tasks:
+  - "Build the project"
+  - "Run tests"
+```
+
+```bash
+aa
+```
+
+#### Using Command-Line Parameters
+
+```bash
+aa -t "Build the project"
+```
+
+#### Overriding Configuration File
+
+```yaml
+cwd: "/home/user/my-project"
+
+tasks:
   - "Task 1"
-  - "Task 2"
+```
+
+```bash
+# This will override both cwd and agent from config file
+aa -c /custom/path --agent "another-agent"
+# Output: ⚠️  配置冲突: 配置文件和命令行参数都指定了 cwd
 ```
 
 ### Test Agent
