@@ -5,6 +5,7 @@ export interface GetSessionParams {
   cwd?: string;
   sessionId?: string;
   mcpServers?: acp.McpServer[];
+  agentCommand?: string;
 }
 
 interface GetSessionRes {
@@ -14,11 +15,11 @@ interface GetSessionRes {
 type GetSession = (params: GetSessionParams) => Promise<GetSessionRes>;
 
 export const getSession: GetSession = async (params) => {
-  const { cwd = process.cwd(), mcpServers = [], sessionId: parmasSessionId } = params;
+  const { cwd = process.cwd(), mcpServers = [], sessionId: paramsSessionId, agentCommand } = params;
 
-  let sessionId = parmasSessionId;
+  let sessionId = paramsSessionId;
 
-  const connection = await getAcpConnection();
+  const connection = await getAcpConnection(agentCommand);
 
   if (sessionId) {
     const loadSessionRes = await connection.loadSession({

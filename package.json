@@ -3,8 +3,13 @@
   "version": "0.0.1",
   "description": "",
   "keywords": [],
-  "license": "ISC",
-  "author": "",
+  "homepage": "https://github.com/wanxger/agent-admin#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wanxger/agent-admin.git"
+  },
+  "license": "MIT",
+  "author": "Wanxger",
   "main": "index.js",
   "scripts": {},
   "packageManager": "pnpm@10.22.0"
