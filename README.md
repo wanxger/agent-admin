@@ -6,16 +6,35 @@ An automated development task execution tool based on ACP (Agent Client Protocol
 
 ---
 
+> 🎁 **Promotion**: Arking Coding Plan supports Doubao, GLM, DeepSeek, Kimi, MiniMax and other models, with unlimited tools. Subscribe now for 10% off, starting from just 36 RMB! The more you subscribe, the better the deal! Subscribe now: https://volcengine.com/L/X1hhwa3aKYk/  Invite code: GVXQVR6M
+
+![Poster](./images/poster.png)
+
+---
+
 ## Quick Start
+
+### Prerequisites
+
+Install opencode (required, used by default):
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+For more information, visit [https://opencode.ai/](https://opencode.ai/)
 
 ### Using npx (Recommended - No installation required)
 
 ```bash
-# Run a single task
+# Run a single task (uses opencode acp by default)
 npx @agent-admin/agent-admin --task "Create a simple HTML webpage"
 
 # Use config file
 npx @agent-admin/agent-admin --file aa.yaml
+
+# Specify a custom agent
+npx @agent-admin/agent-admin --task "Create a simple HTML webpage" --agent "custom-agent --config /path/to/config"
 ```
 
 ### Install globally
@@ -27,7 +46,7 @@ npm install -g @agent-admin/agent-admin
 # or with pnpm
 pnpm add -g @agent-admin/agent-admin
 
-# Run a single task
+# Run a single task (uses opencode acp by default)
 aa --task "Create a simple HTML webpage"
 
 # Or use the full command name
@@ -35,6 +54,9 @@ agent-admin --task "Create a simple HTML webpage"
 
 # Use config file
 aa --file aa.yaml
+
+# Specify a custom agent
+aa --task "Create a simple HTML webpage" --agent "custom-agent --config /path/to/config"
 ```
 
 ---

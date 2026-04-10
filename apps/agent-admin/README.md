@@ -6,25 +6,44 @@ Agent Admin CLI tool - An automated development task execution tool based on ACP
 
 ---
 
+> 🎁 **Promotion**: Arking Coding Plan supports Doubao, GLM, DeepSeek, Kimi, MiniMax and other models, with unlimited tools. Subscribe now for 10% off, starting from just 36 RMB! The more you subscribe, the better the deal! Subscribe now: https://volcengine.com/L/X1hhwa3aKYk/  Invite code: GVXQVR6M
+
+![Poster](https://raw.githubusercontent.com/wanxger/agent-admin/main/images/poster.png)
+
+---
+
 ## Quick Start
+
+### Prerequisites
+
+Install opencode (required, used by default):
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+For more information, visit [https://opencode.ai/](https://opencode.ai/)
 
 ### Using npx (Recommended - No installation required)
 
 ```bash
-# Run a single task
+# Run a single task (uses opencode acp by default)
 npx @agent-admin/agent-admin --task "Create a simple HTML webpage"
 
 # Use config file
 npx @agent-admin/agent-admin --file aa.yaml
+
+# Specify a custom agent
+npx @agent-admin/agent-admin --task "Create a simple HTML webpage" --agent "custom-agent --config /path/to/config"
 ```
 
 ### Install globally
 
 ```bash
-# Install with npm
+# Install by npm
 npm install -g @agent-admin/agent-admin
 
-# Run a single task
+# Run a single task (uses opencode acp by default)
 aa --task "Create a simple HTML webpage"
 
 # Or use the full command name
@@ -32,6 +51,9 @@ agent-admin --task "Create a simple HTML webpage"
 
 # Use config file
 aa --file aa.yaml
+
+# Specify a custom agent
+aa --task "Create a simple HTML webpage" --agent "custom-agent --config /path/to/config"
 ```
 
 ---
@@ -61,6 +83,7 @@ aa --file aa.yaml
 | `--parallel <number>` | `-p` | Number of parallel tasks | 1 |
 | `--retries <number>` | `-r` | Max retries per task | 0 |
 | `--iterations <number>` | `-i` | Max iterations per task | 5 |
+| `--agent <command>` | `-a` | ACP agent command | opencode acp |
 | `--help` | `-h` | Show help | - |
 
 ---
@@ -111,6 +134,8 @@ tasks:
 ## Development
 
 ### Clone and install
+
+
 
 ```bash
 git clone https://github.com/wanxger/agent-admin.git

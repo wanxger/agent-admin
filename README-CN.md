@@ -6,16 +6,35 @@
 
 ---
 
+> 🎁 **优惠信息**：方舟 Coding Plan 支持 Doubao、GLM、DeepSeek、Kimi、MiniMax 等模型，工具不限，现在订阅9折，低至36元，订阅越多越划算！立即订阅：https://volcengine.com/L/X1hhwa3aKYk/  邀请码：GVXQVR6M
+
+![海报](./images/poster.png)
+
+---
+
 ## 快速开始
+
+### 前置要求
+
+安装 opencode（必需，默认使用）：
+
+```bash
+curl -fsSL https://opencode.ai/install | bash
+```
+
+更多信息请访问 [https://opencode.ai/](https://opencode.ai/)
 
 ### 使用 npx（推荐 - 无需安装）
 
 ```bash
-# 执行单个任务
+# 执行单个任务（默认使用 opencode acp）
 npx @agent-admin/agent-admin --task "创建一个简单的 HTML 网页"
 
 # 使用配置文件
 npx @agent-admin/agent-admin --file aa.yaml
+
+# 指定自定义 agent
+npx @agent-admin/agent-admin --task "创建一个简单的 HTML 网页" --agent "custom-agent --config /path/to/config"
 ```
 
 ### 全局安装
@@ -27,7 +46,7 @@ npm install -g @agent-admin/agent-admin
 # 或使用 pnpm
 pnpm add -g @agent-admin/agent-admin
 
-# 执行单个任务
+# 执行单个任务（默认使用 opencode acp）
 aa --task "创建一个简单的 HTML 网页"
 
 # 或使用完整命令名
@@ -35,6 +54,9 @@ agent-admin --task "创建一个简单的 HTML 网页"
 
 # 使用配置文件
 aa --file aa.yaml
+
+# 指定自定义 agent
+aa --task "创建一个简单的 HTML 网页" --agent "custom-agent --config /path/to/config"
 ```
 
 ---
