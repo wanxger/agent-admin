@@ -1,0 +1,14 @@
+cwd: './components'
+parallel: 2
+retries: 1
+iterations: 5
+
+tasks:
+  - task: '创建一个 React 按钮组件，支持点击事件'
+    cwd: './src/components'
+
+  - task: '创建一个 React 表单组件，包含输入验证'
+    cwd: './src/components'
+
+  - task: '创建一个 React 模态框组件'
+    cwd: './src/components'

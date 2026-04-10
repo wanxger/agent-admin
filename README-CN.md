@@ -6,14 +6,46 @@
 
 ---
 
+## 快速开始
+
+### 使用 npx（推荐 - 无需安装）
+
+```bash
+# 执行单个任务
+npx @agent-admin/agent-admin --task "创建一个简单的 HTML 网页"
+
+# 使用配置文件
+npx @agent-admin/agent-admin --file aa.yaml
+```
+
+### 全局安装
+
+```bash
+# 使用 npm 安装
+npm install -g @agent-admin/agent-admin
+
+# 或使用 pnpm
+pnpm add -g @agent-admin/agent-admin
+
+# 执行单个任务
+aa --task "创建一个简单的 HTML 网页"
+
+# 或使用完整命令名
+agent-admin --task "创建一个简单的 HTML 网页"
+
+# 使用配置文件
+aa --file aa.yaml
+```
+
+---
+
 ## 目录
 
+- [快速开始](#快速开始)
 - [项目概述](#项目概述)
 - [包结构](#包结构)
 - [环境要求](#环境要求)
-- [安装](#安装)
-- [快速开始](#快速开始)
-- [开发命令](#开发命令)
+- [开发](#开发)
 - [技术栈](#技术栈)
 - [仓库](#仓库)
 - [许可证](#许可证)
@@ -43,39 +75,32 @@ Agent Admin 是一个 Rush 管理的 TypeScript monorepo，提供了自动化开
 
 ---
 
-## 安装
+## 开发
 
-### 全局安装 CLI
-
-```bash
-npm install -g @agent-admin/agent-admin
-# 或
-pnpm add -g @agent-admin/agent-admin
-```
-
-### 从源码开发
+### 克隆并安装
 
 ```bash
-# 克隆仓库
 git clone https://github.com/wanxger/agent-admin.git
 cd agent-admin
 
-# 安装依赖
 rush update
-
-# 构建项目
-rush build
 ```
 
-#### 本地链接 (npm link)
-
-开发过程中可以使用 npm link 将本地版本链接到全局：
+### 构建
 
 ```bash
-# 进入 CLI 项目目录
-cd apps/agent-admin
+# 构建所有项目
+rush build
 
-# 链接到全局
+# 清理所有项目
+rush clean
+```
+
+### 本地开发链接
+
+```bash
+# 将 CLI 链接到全局
+cd apps/agent-admin
 npm link
 
 # 现在可以在任何地方使用 `aa` 命令
@@ -85,47 +110,7 @@ aa --help
 npm unlink @agent-admin/agent-admin
 ```
 
----
-
-## 快速开始
-
-### 使用 CLI
-
-CLI 提供两个命令别名：
-- `aa` - 简短别名
-- `agent-admin` - 完整命令名
-
-```bash
-# 执行单个任务 (使用简短别名)
-aa --task "创建一个简单的 HTML 网页"
-
-# 或使用完整命令名
-agent-admin --task "创建一个简单的 HTML 网页"
-
-# 使用配置文件
-aa --file aa.yaml
-```
-
-更多用法请参考 [@agent-admin/agent-admin 文档](./apps/agent-admin/README-CN.md)。
-
----
-
-## 开发命令
-
-### 根目录命令
-
-```bash
-# 安装依赖
-rush update
-
-# 构建所有项目
-rush build
-
-# 清理所有项目
-rush clean
-```
-
-### 项目特定命令
+### 开发命令
 
 #### apps/agent-admin
 
@@ -135,7 +120,7 @@ pnpm build      # 编译 TypeScript
 pnpm clean      # 清理构建输出
 pnpm dev        # 开发模式 (tsx)
 pnpm start      # 运行编译后的代码
-pnpm test       # 运行测试 (待实现)
+pnpm test       # 运行测试 (Vitest)
 ```
 
 #### libs/prompt
@@ -144,7 +129,7 @@ pnpm test       # 运行测试 (待实现)
 cd libs/prompt
 pnpm build      # 编译 TypeScript
 pnpm clean      # 清理构建输出
-pnpm test       # 运行测试 (待实现)
+pnpm test       # 运行测试 (Vitest)
 ```
 
 ---

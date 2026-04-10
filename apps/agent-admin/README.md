@@ -6,95 +6,48 @@ Agent Admin CLI tool - An automated development task execution tool based on ACP
 
 ---
 
+## Quick Start
+
+### Using npx (Recommended - No installation required)
+
+```bash
+# Run a single task
+npx @agent-admin/agent-admin --task "Create a simple HTML webpage"
+
+# Use config file
+npx @agent-admin/agent-admin --file aa.yaml
+```
+
+### Install globally
+
+```bash
+# Install with npm
+npm install -g @agent-admin/agent-admin
+
+# Run a single task
+aa --task "Create a simple HTML webpage"
+
+# Or use the full command name
+agent-admin --task "Create a simple HTML webpage"
+
+# Use config file
+aa --file aa.yaml
+```
+
+---
+
 ## Table of Contents
 
-- [Installation](#installation)
 - [Quick Start](#quick-start)
 - [CLI Options](#cli-options)
 - [Usage Examples](#usage-examples)
 - [YAML Config Format](#yaml-config-format)
 - [How It Works](#how-it-works)
-- [Development Guide](#development-guide)
+- [Development](#development)
 - [Project Structure](#project-structure)
 - [Related Packages](#related-packages)
 - [License](#license)
 - [Repository](#repository)
-
----
-
-## Installation
-
-### Install from npm
-
-```bash
-npm install -g @agent-admin/agent-admin
-# or
-yarn global add @agent-admin/agent-admin
-# or
-pnpm add -g @agent-admin/agent-admin
-```
-
-### Develop from Source
-
-```bash
-git clone https://github.com/wanxger/agent-admin.git
-cd agent-admin
-rush update
-rush build
-```
-
-#### npm link
-
-You can use npm link to link the local version globally during development:
-
-```bash
-# cd to project directory
-cd apps/agent-admin
-
-# link to global
-npm link
-
-# now you can use `aa` command anywhere
-aa --help
-
-# unlink
-npm unlink @agent-admin/agent-admin
-```
-
----
-
-## Quick Start
-
-The CLI provides two command aliases:
-- `aa` - Short alias
-- `agent-admin` - Full command name
-
-### 1. Run a single task
-
-```bash
-# using short alias
-aa --task "Create a simple HTML webpage"
-
-# or using full command name
-agent-admin --task "Create a simple HTML webpage"
-```
-
-### 2. Use YAML config file
-
-Create `aa.yaml`:
-
-```yaml
-tasks:
-  - Create a simple HTML webpage
-  - Create a React component
-  - Write unit tests
-```
-
-Then run:
-
-```bash
-aa --file aa.yaml
-```
 
 ---
 
@@ -155,23 +108,34 @@ tasks:
 
 ---
 
-## Development Guide
+## Development
+
+### Clone and install
 
 ```bash
-# cd to project directory
+git clone https://github.com/wanxger/agent-admin.git
+cd agent-admin
+rush update
+rush build
+```
+
+### Link for local development
+
+```bash
 cd apps/agent-admin
+npm link
 
-# dev mode (watch)
-pnpm dev
+aa --help
+npm unlink @agent-admin/agent-admin
+```
 
-# build
-pnpm build
+### Development commands
 
-# clean
-pnpm clean
-
-# test (TBD)
-pnpm test
+```bash
+pnpm dev      # dev mode (watch)
+pnpm build    # build
+pnpm clean    # clean
+pnpm test     # run tests
 ```
 
 ---

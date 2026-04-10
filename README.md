@@ -6,14 +6,46 @@ An automated development task execution tool based on ACP (Agent Client Protocol
 
 ---
 
+## Quick Start
+
+### Using npx (Recommended - No installation required)
+
+```bash
+# Run a single task
+npx @agent-admin/agent-admin --task "Create a simple HTML webpage"
+
+# Use config file
+npx @agent-admin/agent-admin --file aa.yaml
+```
+
+### Install globally
+
+```bash
+# Install with npm
+npm install -g @agent-admin/agent-admin
+
+# or with pnpm
+pnpm add -g @agent-admin/agent-admin
+
+# Run a single task
+aa --task "Create a simple HTML webpage"
+
+# Or use the full command name
+agent-admin --task "Create a simple HTML webpage"
+
+# Use config file
+aa --file aa.yaml
+```
+
+---
+
 ## Table of Contents
 
+- [Quick Start](#quick-start)
 - [Project Overview](#project-overview)
 - [Package Structure](#package-structure)
 - [Requirements](#requirements)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Development Commands](#development-commands)
+- [Development](#development)
 - [Tech Stack](#tech-stack)
 - [Repository](#repository)
 - [License](#license)
@@ -43,89 +75,42 @@ Agent Admin is a Rush-managed TypeScript monorepo that provides a CLI tool and r
 
 ---
 
-## Installation
+## Development
 
-### Install CLI globally
-
-```bash
-npm install -g @agent-admin/agent-admin
-# or
-pnpm add -g @agent-admin/agent-admin
-```
-
-### Develop from Source
+### Clone and install
 
 ```bash
-# clone repository
 git clone https://github.com/wanxger/agent-admin.git
 cd agent-admin
 
-# install dependencies
 rush update
-
-# build project
-rush build
 ```
 
-#### npm link
-
-You can use npm link to link the local version globally during development:
+### Build
 
 ```bash
-# cd to CLI project directory
-cd apps/agent-admin
-
-# link to global
-npm link
-
-# now you can use `aa` command anywhere
-aa --help
-
-# unlink
-npm unlink @agent-admin/agent-admin
-```
-
----
-
-## Quick Start
-
-### Using the CLI
-
-The CLI provides two command aliases:
-- `aa` - Short alias
-- `agent-admin` - Full command name
-
-```bash
-# run a single task (using short alias)
-aa --task "Create a simple HTML webpage"
-
-# or using full command name
-agent-admin --task "Create a simple HTML webpage"
-
-# use config file
-aa --file aa.yaml
-```
-
-See [@agent-admin/agent-admin documentation](./apps/agent-admin/README.md) for more usage.
-
----
-
-## Development Commands
-
-### Root commands
-
-```bash
-# install dependencies
-rush update
-
-# build all projects
+# Build all projects
 rush build
 
-# clean all projects
+# Clean all projects
 rush clean
 ```
 
-### Project-specific commands
+### Link for local development
+
+```bash
+# Link CLI to global
+cd apps/agent-admin
+npm link
+
+# Now you can use `aa` command anywhere
+aa --help
+
+# Unlink
+npm unlink @agent-admin/agent-admin
+```
+
+### Development commands
 
 #### apps/agent-admin
 
@@ -135,7 +120,7 @@ pnpm build      # compile TypeScript
 pnpm clean      # clean build output
 pnpm dev        # dev mode (tsx)
 pnpm start      # run compiled code
-pnpm test       # run tests (TBD)
+pnpm test       # run tests (Vitest)
 ```
 
 #### libs/prompt
@@ -144,7 +129,7 @@ pnpm test       # run tests (TBD)
 cd libs/prompt
 pnpm build      # compile TypeScript
 pnpm clean      # clean build output
-pnpm test       # run tests (TBD)
+pnpm test       # run tests (Vitest)
 ```
 
 ---
