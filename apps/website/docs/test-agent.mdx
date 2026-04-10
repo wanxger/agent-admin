@@ -1,0 +1,295 @@
+---
+sidebar_position: 7
+---
+
+# Test Agent
+
+Test Agent 是 Agent Admin 内置的测试代理，用于开发、测试和集成测试场景。
+
+## 简介
+
+Test Agent 是从 `@agent-admin/prompt` 包导出的一个测试工具，它可以：
+
+- 自动响应任务请求
+- 模拟 AI 代理的行为
+- 用于单元测试和集成测试
+- 支持自定义响应内容
+
+## 基本使用
+
+### 导入 Test Agent
+
+```typescript
+import { TestAgent } from '@agent-admin/prompt';
+```
+
+### 创建 Test Agent 实例
+
+```typescript
+const testAgent = new TestAgent({
+  autoRespond: true,
+  defaultResponse: 'Test response'
+});
+```
+
+## 配置选项
+
+### autoRespond
+
+是否自动响应任务请求。
+
+- **类型**：boolean
+- **默认值**：false
+- **说明**：设置为 true 时，Test Agent 会自动响应所有请求
+
+### defaultResponse
+
+默认的响应内容。
+
+- **类型**：string
+- **默认值**：undefined
+- **说明**：当没有特定响应设置时使用的默认响应
+
+## 使用示例
+
+### 示例 1：自动响应
+
+```typescript
+import { TestAgent } from '@agent-admin/prompt';
+
+const testAgent = new TestAgent({
+  autoRespond: true,
+  defaultResponse: 'Task completed successfully'
+});
+
+// Test Agent 会自动响应所有请求
+```
+
+### 示例 2：自定义响应
+
+```typescript
+const testAgent = new TestAgent({
+  autoRespond: true,
+  defaultResponse: 'Custom response for testing'
+});
+```
+
+### 示例 3：用于集成测试
+
+```typescript
+import { TestAgent } from '@agent-admin/prompt';
+import { describe, it, expect } from 'vitest';
+
+describe('Agent Admin Integration Tests', () => {
+  it('should execute task with Test Agent', async () => {
+    const testAgent = new TestAgent({
+      autoRespond: true,
+      defaultResponse: 'Test response'
+    });
+
+    // 使用 Test Agent 执行任务
+    const result = await testAgent.executeTask('Test task');
+
+    expect(result).toBe('Test response');
+  });
+});
+```
+
+## 在配置文件中使用
+
+### 开发环境配置
+
+```yaml
+# config/dev.yaml
+agent: "test-agent --auto-respond --response 'Development test response'"
+
+tasks:
+  - '测试任务 1'
+  - '测试任务 2'
+```
+
+### 测试环境配置
+
+```yaml
+# config/test.yaml
+agent: 'test-agent --auto-respond'
+
+tasks:
+  - '单元测试'
+  - '集成测试'
+  - '端到端测试'
+```
+
+## Test Agent
+
+更多关于 Test Agent 的详细信息，请查看源码：
+
+`libs/prompt/src/utils/test-agent.ts`
+
+## 使用场景
+
+### 1. 本地开发
+
+在开发过程中使用 Test Agent 快速测试流程，不需要实际的 AI 代理：
+
+```yaml
+agent: 'test-agent --auto-respond'
+
+tasks:
+  - '测试工作流程'
+```
+
+### 2. 单元测试
+
+在单元测试中使用 Test Agent 模拟代理行为：
+
+```typescript
+import { TestAgent } from '@agent-admin/prompt';
+
+describe('Task Executor', () => {
+  it('should handle task execution', async () => {
+    const testAgent = new TestAgent({
+      autoRespond: true,
+      defaultResponse: 'Success'
+    });
+
+    // 测试代码...
+  });
+});
+```
+
+### 3. 集成测试
+
+测试整个 Agent Admin 流程：
+
+```typescript
+import { TestAgent } from '@agent-admin/prompt';
+
+describe('Integration Tests', () => {
+  it('should complete full workflow', async () => {
+    const testAgent = new TestAgent({
+      autoRespond: true
+    });
+
+    // 执行完整的工作流程测试
+  });
+});
+```
+
+### 4. CI/CD 测试
+
+在持续集成中使用 Test Agent 进行自动化测试：
+
+```yaml
+# .github/workflows/test.yml
+name: Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests with Test Agent
+        run: |
+          aa -f config/test.yaml
+```
+
+## 最佳实践
+
+### 1. 分测试配置
+
+为不同的测试场景创建不同的配置：
+
+```
+config/
+├── dev-test.yaml
+├── unit-test.yaml
+├── integration-test.yaml
+└── e2e-test.yaml
+```
+
+### 2. 使用有意义的响应
+
+```typescript
+const testAgent = new TestAgent({
+  autoRespond: true,
+  defaultResponse: 'Integration test response - verify output format'
+});
+```
+
+### 3. 组合使用
+
+Test Agent 可以与其他测试工具组合使用：
+
+```typescript
+import { TestAgent } from '@agent-admin/prompt';
+import { describe, it, expect, vi } from 'vitest';
+
+describe('Combined Tests', () => {
+  it('should work with other test utilities', async () => {
+    const mockFn = vi.fn();
+    const testAgent = new TestAgent({
+      autoRespond: true,
+      defaultResponse: 'Response'
+    });
+
+    // 组合使用 Vitest 的 mock 功能和 Test Agent
+  });
+});
+```
+
+## 限制和注意事项
+
+### 1. 仅用于测试
+
+Test Agent 仅用于开发和测试环境，不要在生产环境中使用。
+
+### 2. 无实际 AI 能力
+
+Test Agent 不会调用实际的 AI 服务，只是模拟响应。
+
+### 3. 响应固定
+
+Test Agent 的响应是预设的，不会动态生成。
+
+## 进阶用法
+
+### 自定义响应逻辑
+
+```typescript
+import { TestAgent } from '@agent-admin/prompt';
+
+class CustomTestAgent extends TestAgent {
+  protected async generateResponse(task: string): Promise<string> {
+    // 自定义响应逻辑
+    if (task.includes('error')) {
+      return 'Error response';
+    }
+    return 'Success response';
+  }
+}
+```
+
+### 模拟延迟
+
+```typescript
+import { TestAgent } from '@agent-admin/prompt';
+
+const testAgent = new TestAgent({
+  autoRespond: true,
+  defaultResponse: 'Response after delay',
+  delay: 1000 // 模拟 1 秒延迟
+});
+```
+
+## 相关资源
+
+- [Vitest 文档](https://vitest.dev/)
+- [Agent Client Protocol SDK](https://www.npmjs.com/package/@agentclientprotocol/sdk)
+
+## 下一步
+
+- 回到[使用指南](/docs/usage)
+- 查看[配置](/docs/configuration)

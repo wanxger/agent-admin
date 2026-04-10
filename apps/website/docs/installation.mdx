@@ -1,0 +1,79 @@
+---
+sidebar_position: 2
+---
+
+# 安装
+
+## 环境要求
+
+- Node.js: >= 22.20.0 < 23.0.0
+
+## 通过 npm 安装（推荐）
+
+这是最简单和推荐的安装方式，无需克隆源码或使用 Rush。
+
+### 全局安装
+
+```bash
+npm install -g @agent-admin/agent-admin
+```
+
+安装完成后，你可以在任何地方使用 `aa` 命令。
+
+### 使用 npx（无需安装）
+
+如果你不想全局安装，可以直接使用 npx：
+
+```bash
+npx @agent-admin/agent-admin -t "创建一个简单的 todo 应用"
+```
+
+## 验证安装
+
+运行以下命令验证安装是否成功：
+
+```bash
+aa --help
+```
+
+你应该会看到帮助信息输出。
+
+## 从源码安装（开发者）
+
+如果你是开发者，需要从源码安装并进行开发：
+
+### 环境要求（源码安装）
+
+- Node.js: >= 22.20.0 < 23.0.0
+- pnpm: >= 10.22.0
+- Rush: >= 5.162.0
+
+### 安装步骤
+
+1. 克隆仓库：
+
+```bash
+git clone https://github.com/wanxger/agent-admin.git
+cd agent-admin
+```
+
+2. 安装依赖：
+
+```bash
+rush update
+```
+
+3. 构建项目：
+
+```bash
+rush build
+```
+
+4. 链接全局命令：
+
+```bash
+cd apps/agent-admin
+pnpm link --global
+```
+
+现在你可以从任何地方使用 `aa` 命令了。

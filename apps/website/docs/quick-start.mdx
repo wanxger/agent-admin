@@ -1,0 +1,127 @@
+---
+sidebar_position: 3
+---
+
+# 快速开始
+
+## 基本使用
+
+### 单个任务
+
+最简单的使用方式是通过命令行参数指定一个任务：
+
+```bash
+aa -t "创建一个简单的 todo 应用"
+```
+
+这将使用默认的代理命令（`opencode acp`）在当前目录下执行任务。
+
+### 指定工作目录
+
+```bash
+aa -t "构建项目" -c /path/to/project
+```
+
+### 指定代理命令
+
+```bash
+aa -t "实现登录功能" --agent "custom-agent --config /path/to/config"
+```
+
+## 使用配置文件
+
+### 创建配置文件
+
+在你的项目根目录创建 `aa.yaml` 文件：
+
+```yaml
+cwd: '/home/user/my-project'
+agent: 'opencode acp'
+
+tasks:
+  - '初始化项目结构'
+  - '实现核心功能'
+  - '添加单元测试'
+```
+
+### 运行配置文件
+
+只需在项目目录下运行：
+
+```bash
+aa
+```
+
+Agent Admin 会自动查找并使用 `aa.yaml` 配置文件。
+
+### 指定配置文件位置
+
+```bash
+aa -f /path/to/config.yaml
+```
+
+## 配置文件示例
+
+### 简单配置
+
+```yaml
+tasks:
+  - '构建项目'
+  - '运行测试'
+```
+
+### 带自定义工作目录
+
+```yaml
+cwd: '/home/user/my-project'
+
+tasks:
+  - task: '构建前端'
+    cwd: './frontend'
+
+  - task: '构建后端'
+    cwd: './backend'
+
+  - '运行集成测试'
+```
+
+### 带自定义代理命令
+
+```yaml
+agent: 'my-agent --verbose --timeout 300'
+
+tasks:
+  - '优化数据库查询'
+  - '实现缓存层'
+```
+
+## 优先级说明
+
+当同时存在配置文件和命令行参数时，优先级如下：
+
+1. 命令行参数（最高优先级）
+2. 配置文件
+3. 默认值
+
+例如：
+
+```yaml
+cwd: '/default/path'
+agent: 'default-agent'
+
+tasks:
+  - '任务 1'
+```
+
+运行：
+
+```bash
+aa -c /custom/path --agent "custom-agent"
+```
+
+此时会显示警告信息，但会使用命令行参数的值。
+
+## 下一步
+
+- 了解更多[配置选项](/docs/configuration)
+- 查看[配置文件详细说明](/docs/config-file)

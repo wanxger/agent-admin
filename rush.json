@@ -27,6 +27,10 @@
       "shouldPublish": true
     },
     {
+      "packageName": "@agent-admin/website",
+      "projectFolder": "apps/website"
+    },
+    {
       "packageName": "@agent-admin/prompt",
       "projectFolder": "libs/prompt",
       "shouldPublish": true

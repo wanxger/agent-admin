@@ -1,0 +1,289 @@
+---
+sidebar_position: 6
+---
+
+# 使用指南
+
+## 基本工作流程
+
+### 1. 准备任务
+
+首先明确你想要 AI 代理完成的任务。例如：
+
+- "创建一个 RESTful API"
+- "实现用户认证系统"
+- "优化数据库查询性能"
+
+### 2. 选择配置方式
+
+根据你的需求选择配置方式：
+
+**单个任务（快速测试）**：
+
+```bash
+aa -t "你的任务描述"
+```
+
+**配置文件（批量任务）**：
+
+```bash
+# 创建 aa.yaml
+aa
+```
+
+### 3. 执行任务
+
+运行 Agent Admin，它会：
+
+1. 读取配置
+2. 验证环境
+3. 按顺序执行任务
+4. 显示执行结果
+
+## 任务执行
+
+### 单个任务执行
+
+```bash
+aa -t "创建一个 todo 应用"
+```
+
+Agent Admin 会：
+
+- 使用默认工作目录（当前目录）
+- 使用默认代理命令（`opencode acp`）
+- 执行任务并显示结果
+
+### 批量任务执行
+
+配置文件 `aa.yaml`：
+
+```yaml
+tasks:
+  - '初始化项目结构'
+  - '创建数据库模型'
+  - '实现 API 端点'
+  - '编写单元测试'
+```
+
+运行：
+
+```bash
+aa
+```
+
+Agent Admin 会依次执行所有任务。
+
+### 并行执行（计划功能）
+
+未来版本将支持并行执行多个任务：
+
+```yaml
+tasks:
+  parallel:
+    - '构建前端'
+    - '构建后端'
+```
+
+## 工作目录管理
+
+### 项目级工作目录
+
+在配置文件中设置所有任务的默认工作目录：
+
+```yaml
+cwd: '/path/to/project'
+
+tasks:
+  - '任务 1'
+  - '任务 2'
+```
+
+### 任务级工作目录
+
+为特定任务指定工作目录：
+
+```yaml
+tasks:
+  - task: '构建前端'
+    cwd: './frontend'
+
+  - task: '构建后端'
+    cwd: './backend'
+```
+
+### 命令行覆盖
+
+```bash
+# 覆盖配置文件中的工作目录
+aa -c /custom/path
+```
+
+## 代理命令配置
+
+### 使用默认代理
+
+默认使用 `opencode acp`：
+
+```bash
+aa -t "你的任务"
+```
+
+### 自定义代理
+
+在配置文件中设置：
+
+```yaml
+agent: 'custom-agent --config /path/to/config'
+
+tasks:
+  - '你的任务'
+```
+
+或者使用命令行参数：
+
+```bash
+aa --agent "custom-agent --verbose" -t "你的任务"
+```
+
+## 错误处理
+
+### 配置错误
+
+如果配置文件有误，Agent Admin 会显示错误信息：
+
+```
+❌ 配置错误: 工作目录不存在 /path/to/nonexistent
+```
+
+### 任务执行错误
+
+如果任务执行失败，Agent Admin 会：
+
+1. 显示错误信息
+2. 继续执行后续任务（可配置）
+3. 生成错误报告
+
+## 最佳实践
+
+### 1. 任务描述清晰明确
+
+**不好**：
+
+```yaml
+tasks:
+  - '修复 bug'
+```
+
+**好**：
+
+```yaml
+tasks:
+  - '修复用户登录时的 session 过期问题'
+```
+
+### 2. 合理组织任务
+
+按逻辑顺序组织任务：
+
+```yaml
+tasks:
+  # 准备阶段
+  - '创建项目结构'
+
+  # 开发阶段
+  - '实现核心功能'
+  - '添加单元测试'
+
+  # 部署阶段
+  - '配置 CI/CD'
+  - '编写部署文档'
+```
+
+### 3. 使用版本控制
+
+建议将 `aa.yaml` 加入版本控制：
+
+```bash
+git add aa.yaml
+git commit -m "添加 Agent Admin 配置"
+```
+
+### 4. 环境隔离
+
+为不同环境创建不同的配置文件：
+
+```
+config/
+├── dev.yaml
+├── staging.yaml
+└── prod.yaml
+```
+
+## 进阶用法
+
+### 链式配置
+
+在多个项目中共享配置文件：
+
+```bash
+# 在项目 A 中使用通用配置
+ln -s /common/config/aa.yaml ./aa.yaml
+aa
+```
+
+### 脚本集成
+
+在 CI/CD 脚本中使用：
+
+```bash
+#!/bin/bash
+# .github/workflows/ci.yml
+
+aa -t "运行所有测试"
+if [ $? -eq 0 ]; then
+  echo "✅ 所有测试通过"
+else
+  echo "❌ 测试失败"
+  exit 1
+fi
+```
+
+### 条件执行
+
+根据条件选择配置：
+
+```bash
+if [ "$ENV" = "production" ]; then
+  aa -f config/prod.yaml
+else
+  aa -f config/dev.yaml
+fi
+```
+
+## 调试技巧
+
+### 1. 查看配置解析结果
+
+```bash
+aa --debug
+```
+
+### 2. 测试单个任务
+
+```bash
+aa -t "测试任务"
+```
+
+### 3. 使用 Test Agent
+
+开发时可以使用 Test Agent 模拟代理：
+
+```yaml
+agent: 'test-agent --auto-respond'
+```
+
+## 下一步
+
+- 了解[Test Agent](/docs/test-agent)
+- 回到[配置](/docs/configuration)
