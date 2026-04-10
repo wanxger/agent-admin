@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_agent_admin_website=self.webpackChunk_agent_admin_website||[]).push([["324"],{7823(e){e.exports=JSON.parse('{"metadata":{"permalink":"/agent-admin/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":0,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
